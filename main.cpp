@@ -64,35 +64,48 @@ void exitscr() {
 }
 
 // Transaction Class
-class transaction{
+class transaction
+{
 
 private:
-  string transactionDateTime;
-  string creditCardNumber;
-  string merchantName;
-  string merchantCategory;
-  float amount;
-  string firstName;
-  string lastName;
-  string street;
-  string city;
-  string state;
-  int zipcode;
-  double clintLatitude;
-  double clientLongitude;
-  string clientJob;
-  string transactionNumber;
-  double merchantLatitude;
-  double merchantLongitude;
-  int flag;
+    string transactionDateTime;
+    string creditCardNumber;
+    string merchantName;
+    string merchantCategory;
+    float amount;
+    string firstName;
+    string lastName;
+    string street;
+    string city;
+    string state;
+    int zipcode;
+    double clintLatitude;
+    double clientLongitude;
+    string clientJob;
+    string transactionNumber;
+    double merchantLatitude;
+    double merchantLongitude;
+    int flag;
 
 public:
-  transaction(){
-    flag = 0;
-  }
-  
+    transaction()
+    {
+        flag = 0;
+    }
+    int suddenSpikeInSpending(); // Segment Tree / Sliding Window
+    int detectOverlappingTransactions(); // Interval Tree
+    int transactionValueAnomalies(); // Binary Search / BST
+    int fraudLoopInTransactionHistory(); // DFS / BFS (Cycle Detection)
+    int shortestFraudPathBetweenTransactions(); // Dijkstra
+    int clusterFraudlentTransactionsTogether(); // Union-Find / Kruskal
+    int merchantBasedFraudPatterns(); // Trie
+    int trackFraudelentTransactionHistory(); // BST
+    int identifyTopSuspiciousTransactions(); // Priority Queue
+    int repeatingFraudBehaviourInSubsequence(); // Dynamic Programming (LCS or Edit Distance)
+    int graduallyIncreasingFraudelentTransactionAmount(); // Dynamic Programming (LIS)
+    int unusualSpendingPatterns(); // Knapsack
 };
 
 int main(){
-  return 0;
+    return 0;
 }
