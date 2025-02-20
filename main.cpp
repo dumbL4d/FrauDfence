@@ -101,7 +101,6 @@ public:
     int merchantBasedFraudPatterns(); // Trie
     int trackFraudelentTransactionHistory(); // BST
     int identifyTopSuspiciousTransactions(); // Priority Queue
-    int repeatingFraudBehaviourInSubsequence(); // Dynamic Programming (LCS or Edit Distance)
     int graduallyIncreasingFraudelentTransactionAmount(); // Dynamic Programming (LIS)
     int unusualSpendingPatterns(); // Knapsack
 };
