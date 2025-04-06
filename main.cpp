@@ -1,31 +1,28 @@
 //Including standard library
-#include<iostream>
+#include<bits/stdc++.h>
 #include<stdlib.h>
 #include<stdexcept>
 #include<string>
-#include<conio.h>
-#include<windows.h>
 
 // Time Libraries
 #include<chrono>
 #include<thread>
 
-/*
-//Including MySQL Libraries 
-#include <mysql_connection.h>
-#include <cppconn/driver.h>
-#include <cppconn/exception.h>
-#include <cppconn/resultset.h>
-#include <cppconn/statement.h>
-#include <mysql_driver.h>
-*/
-
 using namespace std;
 
 // Clear Screen Function
 void clearscreen() {
-    system("cls");
+	#ifdef _WIN32
+	system("cls");
+
+	#else
+	system("clear");
+
+	#endif
 }
+
+//INTRO SCREEN
+void intro();
 
 //EXIT SCREEN
 void exitscr() {
@@ -53,7 +50,7 @@ void exitscr() {
         auto duration = chrono::duration_cast<chrono::seconds>(end - start).count();
 
         if (duration >= 3) {
-            system("cls");
+            clearscreen();
             break;
         }
 
@@ -61,7 +58,7 @@ void exitscr() {
         this_thread::sleep_for(chrono::milliseconds(100));
     }
     clearscreen();
-    intro();
+    // intro();
     exit(0);
 }
 
@@ -107,6 +104,10 @@ public:
     int transactionsCompleted;
 };
 
+int graduallyIncreasingFraudelentTransactionAmount(); // Dynamic Programming (LIS)
+
+// TO-DO List
+
 int suddenSpikeInSpending();                          // Segment Tree / Sliding Window
 int detectOverlappingTransactions();                  // Interval Tree
 int transactionValueAnomalies();                      // Binary Search / BST
@@ -116,7 +117,6 @@ int clusterFraudlentTransactionsTogether();           // Union-Find / Kruskal
 int merchantBasedFraudPatterns();                     // Trie
 int trackFraudelentTransactionHistory();              // BST
 int identifyTopSuspiciousTransactions();              // Priority Queue
-int graduallyIncreasingFraudelentTransactionAmount(); // Dynamic Programming (LIS)
 int unusualSpendingPatterns();                        // Knapsack
 
 int graduallyIncreasingFraudelentTransactionAmount(vector<int> &spendings)
@@ -144,5 +144,6 @@ int graduallyIncreasingFraudelentTransactionAmount(vector<int> &spendings)
 }
 
 int main(){
-    return 0;
+        exitscr();
+	return 0;
 }
