@@ -140,15 +140,14 @@ map<string, client> readCSVFile(const string& filename) {
 
 int graduallyIncreasingFraudelentTransactionAmount(); // Dynamic Programming (LIS)
 int suddenSpikeInSpending();                          // Segment Tree / Sliding Window
+int unusualSpendingPatterns();                        // Knapsack
 
 // TO-DO List
  
 int detectOverlappingTransactions();                  // Interval Tree
-int transactionValueAnomalies();                      // Binary Search / BST
 int clusterFraudlentTransactionsTogether();           // Union-Find / Kruskal
 int trackFraudelentTransactionHistory();              // BST
 int identifyTopSuspiciousTransactions();              // Priority Queue
-int unusualSpendingPatterns();                        // Knapsack
 
 // Tree for Segment Tree
 vector<int> tree;
