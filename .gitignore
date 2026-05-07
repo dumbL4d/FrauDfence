@@ -1,0 +1,23 @@
+# Compiled binary
+finalMain
+*.out
+*.exe
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Extracted CSV (only keep the zip)
+*.csv
+fraudTestCSV
