@@ -78,6 +78,7 @@ class transaction {
 // Client Class
 class client {
     public:
+	string creditCardNumber;
         string cardHolderName;
         vector<transaction> arr;
         vector<int> spendings;
@@ -228,8 +229,9 @@ int main() {
 	    }
 
 
-    	for (const auto& [card, clientObj] : allClients) {
+        for (const auto& [card, clientObj] : allClients) {
     		cout << "Checking for fraud on: " << clientObj.cardHolderName << endl;
+		cout << "Credit Card Number:    " << clientObj.creditCardNumber << endl << endl;
 
     		bool fraud1 = graduallyIncreasingFraudelentTransactionAmount(clientObj.spendings);
     		cout << (fraud1 ? "Gradual Increase Fraud Detected!!" : "No Gradual Increase Fraud") << endl;
