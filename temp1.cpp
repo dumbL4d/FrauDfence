@@ -19,21 +19,36 @@ void clearscreen() {
 // EXIT SCREEN
 void exitscr() {
         auto start = chrono::high_resolution_clock::now();
-        cout << endl << endl << endl << endl << endl << endl << endl << endl << endl;
-        cout << "ooooooooooooo ooooo   ooooo       .o.       ooooo      ooo oooo    oooo      oooooo   oooo   .oooooo.   ooooo     ooo \n";
-        cout << "8'   888   `8 `888'   `888'      .888.      `888b.     `8' `888   .8P'        `888.   .8'   d8P'  `Y8b  `888'     `8' \n";
-        cout << "     888       888     888      .8\"888.      8 `88b.    8   888  d8'           `888. .8'   888      888  888       8  \n";
-        cout << "     888       888ooooo888     .8' `888.     8   `88b.  8   88888[              `888.8'    888      888  888       8  \n";
-        cout << "     888       888     888    .88ooo8888.    8     `88b.8   888`88b.             `888'     888      888  888       8  \n";
-        cout << "     888       888     888   .8'     `888.   8       `888   888  `88b.            888      `88b    d88'  `88.    .8'  \n";
-        cout << "    o888o     o888o   o888o o88o     o8888o o8o        `8  o888o  o888o          o888o      `Y8bood8P'     `YbodP'\n";
-        cout << "                         oooooooooooo   .oooooo.   ooooooooo.        ooooo     ooo  .oooooo..o ooooo ooooo      ooo   .oooooo.    \n";
-        cout << "                         `888'     `8  d8P'  `Y8b  `888   `Y88.      `888'     `8' d8P'    `Y8 `888' `888b.     `8'  d8P'  `Y8b   \n";
-        cout << "                          888         888      888  888   .d88'       888       8  Y88bo.       888   8 `88b.    8  888           \n";
-        cout << "                          888oooo8    888      888  888ooo88P'        888       8   `\"Y8888o.   888   8   `88b.  8  888           \n";
-        cout << "                          888    \"    888      888  888`88b.          888       8       `\"Y88b  888   8     `88b.8  888     ooooo \n";
-        cout << "                          888         `88b    d88'  888  `88b.        `88.    .8'  oo     .d8P  888   8       `888  `88.    .88'  \n";
-        cout << "                         o888o         `Y8bood8P'  o888o  o888o         `YbodP'    8\"\"88888P'  o888o o8o        `8   `Y8bood8P'\n";
+       const std::string blue = "\033[1;34m";
+ const std::string black = "\033[30m";
+ const std::string red = "\033[31m";
+ const std::string green = "\033[32m";
+ const std::string yellow= "\033[33m";
+ const std::string magenta = "\033[35m";
+ const std::string cyan= "\033[36m";
+ const std::string white= "\033[37m";
+ cout<<"\033[1m";
+ cout <<yellow<< R"(    
+	     _   _                 _                             
+            | | | |               | |                            
+            | |_| |__   __ _ _ __ | | __   _   _  ___  _   _     
+            | __| '_ \ / _` | '_ \| |/ /  | | | |/ _ \| | | |    
+            | |_| | | | (_| | | | |   <   | |_| | (_) | |_| |    
+             \__|_| |_|\__,_|_| |_|_|\_\   \__, |\___/ \__,_|    
+                                            __/ |                
+                                           |___/                 
+                        __                        _              
+                       / _|                      (_)             
+                      | |_ ___  _ __    _   _ ___ _ _ __   __ _  
+                      |  _/ _ \| '__|  | | | / __| | '_ \ / _` | 
+                      | || (_) | |     | |_| \__ \ | | | | (_| | 
+                      |_| \___/|_|      \__,_|___/_|_| |_|\__, | 
+                                                           __/ | 
+                                                          |___/  
+	  )" <<endl;
+ cout<<endl;
+
+
         while (true) {
             auto end = chrono::high_resolution_clock::now();
             auto duration = chrono::duration_cast<chrono::seconds>(end - start).count();
