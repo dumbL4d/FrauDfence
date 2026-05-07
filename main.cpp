@@ -143,7 +143,7 @@ int graduallyIncreasingFraudelentTransactionAmount(); // Dynamic Programming (LI
 int suddenSpikeInSpending();                          // Segment Tree / Sliding Window
 int unusualSpendingPatterns();                        // Knapsack
 int detectOverlappingTransactions();                  // Interval Tree
-						      
+					      
 // TO-DO List
  
 int clusterFraudlentTransactionsTogether();           // Union-Find / Kruskal
@@ -210,16 +210,18 @@ int suddenSpikeInSpending(const vector<int>& transactions) {
     	return 0;
 }
 
+// Structures of Interval Tree
 struct Interval {
-    int start, end;
+    double start, end;
 };
 
 struct Node {
     Interval *interval;
-    int maxEnd;
+    double maxEnd;
     Node *left, *right;
 };
 
+// Functions for Interval Tree
 Node* newNode(Interval i) {
     Node* node = new Node();
     node->interval = new Interval(i);
@@ -239,6 +241,13 @@ Node* insert(Node* root, Interval i) {
     return root;
 }
 
+double extractTimeInMinutes(const string& dt) {
+    double hour = stod(dt.substr(11, 2));
+    double minute = stod(dt.substr(14, 2));
+    double second = stod(dt.substr(17, 2));
+    return hour * 60 + minute + (second / 60.0);  // fractional minute
+}
+
 bool doOverlap(Interval i1, Interval i2) {
     return (i1.start < i2.end && i2.start < i1.end);
 }
@@ -253,14 +262,16 @@ bool overlapSearch(Node* root, Interval i) {
 
 int detectOverlappingTransactions(const vector<transaction>& txns) {
     Node* root = nullptr;
+    double window = 1; // can be set to any fractional value
 
     for (const auto& t : txns) {
-        int start = stoi(t.transactionDateTime.substr(11, 2)) * 60 +
-                    stoi(t.transactionDateTime.substr(14, 2)); // HH:MM -> minutes
-        Interval newTxn = {start, start + 1}; // 1-min transaction window
+        double start = extractTimeInMinutes(t.transactionDateTime);
+        Interval newTxn = {start, start + window};
+
         if (overlapSearch(root, newTxn)) {
             return 1;
         }
+
         root = insert(root, newTxn);
     }
 
