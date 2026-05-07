@@ -624,8 +624,10 @@ int main()
         }
 
         // Analyze each client individually for gradual/spike spending fraud
+	int i = 1;
         for (const auto& [card, clientObj] : allClients) 
         {
+		cout << i++ << ". \n";
                 cout << yellow << "Checking for fraud on: " << white << clientObj.cardHolderName << endl;
 
                 bool fraud1 = graduallyIncreasingFraudelentTransactionAmount(clientObj.spendings);
