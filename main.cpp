@@ -142,10 +142,10 @@ map<string, client> readCSVFile(const string& filename) {
 int graduallyIncreasingFraudelentTransactionAmount(); // Dynamic Programming (LIS)
 int suddenSpikeInSpending();                          // Segment Tree / Sliding Window
 int unusualSpendingPatterns();                        // Knapsack
-
+int detectOverlappingTransactions();                  // Interval Tree
+						      
 // TO-DO List
  
-int detectOverlappingTransactions();                  // Interval Tree
 int clusterFraudlentTransactionsTogether();           // Union-Find / Kruskal
 int trackFraudelentTransactionHistory();              // BST
 int identifyTopSuspiciousTransactions();              // Priority Queue
@@ -257,7 +257,7 @@ int detectOverlappingTransactions(const vector<transaction>& txns) {
     for (const auto& t : txns) {
         int start = stoi(t.transactionDateTime.substr(11, 2)) * 60 +
                     stoi(t.transactionDateTime.substr(14, 2)); // HH:MM -> minutes
-        Interval newTxn = {start, start + 2}; // 2-min transaction window
+        Interval newTxn = {start, start + 1}; // 1-min transaction window
         if (overlapSearch(root, newTxn)) {
             return 1;
         }
