@@ -109,7 +109,7 @@ map<string, client> readCSVFile(const string& filename) {
 
             getline(ss, field, ','); replace(field.begin(), field.end(), '|', ','); t.amount = stof(field);
             getline(ss, t.firstName, ',');
-	        getline(ss, t.lastName, ',');
+	    getline(ss, t.lastName, ',');
             getline(ss, t.street, ',');
             getline(ss, t.city, ',');
             getline(ss, t.state, ',');
