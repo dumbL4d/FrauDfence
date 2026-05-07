@@ -2,6 +2,26 @@
 
 A credit card fraud detection system in C++ that applies 6 different algorithmic techniques to detect fraudulent transaction patterns. Reads transaction history from CSV and runs detection algorithms per cardholder and across the entire dataset.
 
+## How It Works
+
+```mermaid
+flowchart LR
+    A["fraudTestCSV.csv"] --> B["Parse & Group<br/>by Card Number"]
+    B --> C1["LIS<br/>Gradual Increase"]
+    B --> C2["Segment Tree<br/>Sudden Spike"]
+    B --> C3["Interval Tree<br/>Overlapping Txns"]
+    B --> C4["0/1 Knapsack<br/>Unusual Patterns"]
+    B --> C5["Union-Find<br/>Fraud Clusters"]
+    B --> C6["Dijkstra<br/>Fraud Paths"]
+    C1 --> D["Fraud Score"]
+    C2 --> D
+    C3 --> D
+    C4 --> D
+    C5 --> D
+    C6 --> D
+    D --> E["🚨 Alert / No Alert"]
+```
+
 ## Detection Algorithms
 
 | # | Algorithm | Data Structure | What it detects |
