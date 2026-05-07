@@ -846,6 +846,7 @@ int main()
 		char f;
 		cin >> f;
 		displayCenteredMenu(menu);
+		cout << white;
 	}while(true);
 
         
