@@ -175,7 +175,6 @@ int transactionValueAnomalies();                      // Binary Search / BST
 int fraudLoopInTransactionHistory();                  // DFS / BFS (Cycle Detection)
 int shortestFraudPathBetweenTransactions();           // Dijkstra
 int clusterFraudlentTransactionsTogether();           // Union-Find / Kruskal
-int merchantBasedFraudPatterns();                     // Trie
 int trackFraudelentTransactionHistory();              // BST
 int identifyTopSuspiciousTransactions();              // Priority Queue
 int unusualSpendingPatterns();                        // Knapsack
