@@ -210,6 +210,63 @@ int suddenSpikeInSpending(const vector<int>& transactions) {
     	return 0;
 }
 
+struct Interval {
+    int start, end;
+};
+
+struct Node {
+    Interval *interval;
+    int maxEnd;
+    Node *left, *right;
+};
+
+Node* newNode(Interval i) {
+    Node* node = new Node();
+    node->interval = new Interval(i);
+    node->maxEnd = i.end;
+    node->left = node->right = nullptr;
+    return node;
+}
+
+Node* insert(Node* root, Interval i) {
+    if (!root) return newNode(i);
+    
+    int l = root->interval->start;
+    if (i.start < l) root->left = insert(root->left, i);
+    else root->right = insert(root->right, i);
+    
+    root->maxEnd = std::max(root->maxEnd, i.end);
+    return root;
+}
+
+bool doOverlap(Interval i1, Interval i2) {
+    return (i1.start < i2.end && i2.start < i1.end);
+}
+
+bool overlapSearch(Node* root, Interval i) {
+    if (!root) return false;
+    if (doOverlap(*root->interval, i)) return true;
+    if (root->left && root->left->maxEnd >= i.start)
+        return overlapSearch(root->left, i);
+    return overlapSearch(root->right, i);
+}
+
+int detectOverlappingTransactions(const vector<transaction>& txns) {
+    Node* root = nullptr;
+
+    for (const auto& t : txns) {
+        int start = stoi(t.transactionDateTime.substr(11, 2)) * 60 +
+                    stoi(t.transactionDateTime.substr(14, 2)); // HH:MM -> minutes
+        Interval newTxn = {start, start + 2}; // 2-min transaction window
+        if (overlapSearch(root, newTxn)) {
+            return 1;
+        }
+        root = insert(root, newTxn);
+    }
+
+    return 0;
+}
+
 // MAIN
 int main() {
     	string filename = "fraudTestCSV.csv";
@@ -229,20 +286,20 @@ int main() {
 	    }
 
 
-        for (const auto& [card, clientObj] : allClients) {
+    	for (const auto& [card, clientObj] : allClients) {
     		cout << "Checking for fraud on: " << clientObj.cardHolderName << endl;
-		cout << "Credit Card Number:    " << clientObj.creditCardNumber << endl << endl;
 
     		bool fraud1 = graduallyIncreasingFraudelentTransactionAmount(clientObj.spendings);
     		cout << (fraud1 ? "Gradual Increase Fraud Detected!!" : "No Gradual Increase Fraud") << endl;
 
     		bool fraud2 = suddenSpikeInSpending(clientObj.spendings);
     		cout << (fraud2 ? "Sudden Spending Spike Detected!" : "No Sudden Spike") << endl;
+		
+		bool fraud3 = detectOverlappingTransactions(clientObj.arr);
+		cout << (fraud3 ? "Overlapping Transactions Detected!" : "No Overlap Found") << endl;
 
     		cout << "----------------------------------------------------\n";
 	    }
 
 	    return 0;
 }
-
-
