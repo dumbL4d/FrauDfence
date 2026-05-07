@@ -146,7 +146,7 @@ int detectOverlappingTransactions();                  // Interval Tree
 					      
 // TO-DO List
 
-void fraudLoopInTransactionHistory();		      // DFS / BFS (Cycle Detection)
+int fraudLoopInTransactionHistory();		      // DFS / BFS (Cycle Detection)
 int shortestFraudPathBetweenTransactions();	      // Djikstra
 int clusterFraudlentTransactionsTogether();           // Union-Find / Kruskal
 int trackFraudelentTransactionHistory();              // BST
