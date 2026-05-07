@@ -139,6 +139,18 @@ map<string, client> readCSVFile(const string& filename) {
     return clients;
 }
 
+int graduallyIncreasingFraudelentTransactionAmount(); // Dynamic Programming (LIS)
+int suddenSpikeInSpending();                          // Segment Tree / Sliding Window
+
+// TO-DO List
+ 
+int detectOverlappingTransactions();                  // Interval Tree
+int transactionValueAnomalies();                      // Binary Search / BST
+int clusterFraudlentTransactionsTogether();           // Union-Find / Kruskal
+int trackFraudelentTransactionHistory();              // BST
+int identifyTopSuspiciousTransactions();              // Priority Queue
+int unusualSpendingPatterns();                        // Knapsack
+
 // Tree for Segment Tree
 vector<int> tree;
 
@@ -205,17 +217,17 @@ int main() {
     	map<string, client> allClients = readCSVFile(filename);
 
 	for (auto& [card, clientObj] : allClients) {
-    // Sort transactions by date
-    sort(clientObj.arr.begin(), clientObj.arr.end(), [](const transaction& a, const transaction& b) {
-        return a.transactionDateTime < b.transactionDateTime;
-    });
+		// Sort transactions by date
+    		sort(clientObj.arr.begin(), clientObj.arr.end(), [](const transaction& a, const transaction& b) {
+        		return a.transactionDateTime < b.transactionDateTime;
+    		});
 
-    // Clear and rebuild spendings in sorted order
-    clientObj.spendings.clear();
-    for (const auto& t : clientObj.arr) {
-        clientObj.spendings.push_back((int)t.amount);
-    }
-}
+    		// Clear and rebuild spendings in sorted order
+    		clientObj.spendings.clear();
+    		for (const auto& t : clientObj.arr) {
+        		clientObj.spendings.push_back((int)t.amount);
+    		}
+	}
 
 
     	for (const auto& [card, clientObj] : allClients) {
