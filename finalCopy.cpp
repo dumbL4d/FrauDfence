@@ -6,6 +6,14 @@
 #include <thread>
 #include <fstream>
 #include <cfloat>
+#include <unordered_set>
+
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <sys/ioctl.h>
+#include <unistd.h>
+#endif
 
 using namespace std;
 
@@ -29,49 +37,38 @@ void clearscreen()
 }
 
 // INTRO SCR
-void intro()
-{
+void intro() {
+	clearscreen();
 	auto start = chrono::high_resolution_clock::now();
 
-        cout << "\033[1m";
-    	cout << yellow << R"(    
-	     _   _                 _                             
-            | | | |               | |                            
-            | |_| |__   __ _ _ __ | | __   _   _  ___  _   _     
-            | __| '_ \ / _` | '_ \| |/ /  | | | |/ _ \| | | |    
-            | |_| | | | (_| | | | |   <   | |_| | (_) | |_| |    
-             \__|_| |_|\__,_|_| |_|_|\_\   \__, |\___/ \__,_|    
-                                            __/ |                
-                                           |___/                 
-                        __                        _              
-                       / _|                      (_)             
-                      | |_ ___  _ __    _   _ ___ _ _ __   __ _  
-                      |  _/ _ \| '__|  | | | / __| | '_ \ / _` | 
-                      | || (_) | |     | |_| \__ \ | | | | (_| | 
-                      |_| \___/|_|      \__,_|___/_|_| |_|\__, | 
-                                                           __/ | 
-                                                          |___/  
-	  )" << endl;
-    	cout << endl;
+    	cout << "\033[1m"; // Bold text
 
-    	while (true)
-    	{
+    	cout << R"(
+ 	 	 _____                ____   __                     
+ 		|  ___| __ __ _ _   _|  _ \ / _| ___ _ __   ___ ___ 
+ 		| |_ | '__/ _` | | | | | | | |_ / _ \ '_ \ / __/ _ \
+ 		|  _|| | | (_| | |_| | |_| |  _|  __/ | | | (_|  __/
+ 		|_|  |_|  \__,_|\__,_|____/|_|  \___|_| |_|\___\___|
+ 	   )" << endl;
+
+    	while (true) {
         	auto end = chrono::high_resolution_clock::now();
         	auto duration = chrono::duration_cast<chrono::seconds>(end - start).count();
 
-        	if (duration >= 3)
-        	{
-            		clearscreen();
-            		break;
+        	if (duration >= 3) {
+            	clearscreen();
+            	break;
         	}
         	this_thread::sleep_for(chrono::milliseconds(100));
     	}
+
     	clearscreen();
 }
 
 // EXIT SCR
 void exitscr()
 {
+	clearscreen();
     	auto start = chrono::high_resolution_clock::now();
 
         cout << "\033[1m";
@@ -109,6 +106,42 @@ void exitscr()
     	}
     	clearscreen();
     	exit(0);
+}
+
+void getTerminalSize(int &rows, int &cols) {
+#ifdef _WIN32
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+    cols = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+    rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+#else
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+    cols = w.ws_col;
+    rows = w.ws_row;
+#endif
+}
+
+// Function to display centered menu
+void displayCenteredMenu(const vector<string> &menuItems) {
+    int rows, cols;
+    getTerminalSize(rows, cols);
+
+    int menuHeight = menuItems.size();
+    int maxLength = 0;
+    for (const auto &item : menuItems)
+        if (item.length() > maxLength)
+            maxLength = item.length();
+
+    int startRow = (rows - menuHeight) / 2;
+    int startCol = (cols - maxLength) / 2;
+
+    // Clear screen
+    clearscreen();
+
+    for (int i = 0; i < menuItems.size(); ++i) {
+        cout << "\033[" << (startRow + i) << ";" << startCol << "H" << menuItems[i] << "\n";
+    }
 }
 
 // Transaction Class
@@ -216,6 +249,7 @@ map<string, client> readCSVFile(const string &filename)
         return clients;
 }
 
+/*
 int graduallyIncreasingFraudelentTransactionAmount(); // Dynamic Programming (LIS)
 int suddenSpikeInSpending();                         // Segment Tree
 int unusualSpendingPatterns();                       // Knapsack (Greedy)
@@ -223,6 +257,7 @@ int detectOverlappingTransactions();                 // Interval Tree
 int fraudLoopInTransactionHistory();                 // DFS / BFS (Cycle Detection)
 int shortestFraudPathBetweenTransactions();          // Djikstra Algorithm
 int clusterFraudlentTransactionsTogether();          // Union-Find / Kruskal
+*/
 
 // Tree for Segment Tree
 vector<int> tree;
@@ -686,12 +721,12 @@ int fraudLoopInTransactionHistory(const vector<transaction>& transactions) {
 int main()
 {
 	intro();
+	cout << "Transaction Data is being imported..." << endl;
         string filename = "fraudTestCSV.csv";
         map<string, client> allClients = readCSVFile(filename);
         vector<transaction> allTransactions;
-
-        for (auto &it : allClients)
-        {
+	for (auto &it : allClients)
+	{
                 string card = it.first;
                 client &clientObj = it.second;
                 // Sort transactions by date
@@ -706,51 +741,117 @@ int main()
                         allTransactions.push_back(t); // Collect all transactions globally
                 }
         }
+	
 
-        // Analyze each client individually for gradual/spike spending fraud
-	int i = 1;
-        for (const auto& [card, clientObj] : allClients) 
-        {
-		cout << i++ << ". \n";
-                cout << yellow << "Checking for fraud on: " << white << clientObj.cardHolderName << endl;
+	vector<string> menu = {
+		"+-----------------------------------------------+",
+        	"|                 FRAUD MENU                    |",
+        	"+-----------------------------------------------+",
+        	"| 1. Gradual Increase Fraud                     |",
+        	"| 2. Sudden Spike in Spending Fraud             |",
+        	"| 3. Overlapping Transactions Fraud             |",
+		"| 4. Unusual Spending Pattern Fraud             |",
+        	"| 5. Fraud Clusters                             |",
+        	"| 6. Indirect Fraud Paths                       |",
+        	"| 7. Exit                                       |",
+        	"+-----------------------------------------------+"
+    	};
 
-                bool fraud1 = graduallyIncreasingFraudelentTransactionAmount(clientObj.spendings);
-                cout << (fraud1 ? (red + "Gradual Increase Fraud Detected!!") : (green + "No Gradual Increase Fraud")) << endl;
+	displayCenteredMenu(menu);
+	int choice;
+	do 
+	{
+		cout << "Enter your choice: ";
+		cin >> choice;
 
-                bool fraud2 = suddenSpikeInSpending(clientObj.spendings);
-                cout << (fraud2 ? (red + "Sudden Spending Spike Detected!") : (green + "No Sudden Spike")) << endl;
+		if (choice == 1)
+		{
+			int i = 1;
+			for(const auto& [card, clientObj] : allClients)
+			{
+				cout << i++ << ". \n";
+				cout << yellow << "Checking fraud on: " << white << clientObj.cardHolderName << endl;
+				bool fraud1 = graduallyIncreasingFraudelentTransactionAmount(clientObj.spendings);
+				cout << (fraud1 ? (red + "Gradual Increase Fraud Detected!!") : (green + "No Gradual Increase Fraud")) << endl;
+				cout << blue << "----------------------------------------------------\n";
+			}
+		}
+		else if(choice == 2)
+		{
+			int i = 1;
+			for(const auto& [card, clientObj] : allClients)
+			{
+				cout << i++ << ". \n";
+				cout << yellow << "Checking fraud on: " << white << clientObj.cardHolderName << endl;
+				bool fraud2 = suddenSpikeInSpending(clientObj.spendings);
+				cout << (fraud2 ? (red + "Sudden Spending Spike Detected!!") : (green + "No Sudden Spike")) << endl;
+				cout << blue << "----------------------------------------------------\n";
+			}
+		}
+		else if(choice == 3)
+		{
+			int i = 1;
+			for(const auto& [card, clientObj] : allClients)
+			{
+				cout << i++ << ". \n";
+				cout << yellow << "Checking fraud on: " << white << clientObj.cardHolderName << endl;
+				int fraud3 = detectOverlappingTransactions(clientObj.arr);
+				cout << (fraud3 ? (red + "Overlapping Transactions Detected !!") : (green + "No Overlapping Transactions")) << endl;
+				cout << blue << "----------------------------------------------------\n";
+			}
+		}
+		else if(choice == 4)
+		{
+			int i = 1;
+			for (const auto& [card, clientObj] : allClients)
+			{
+				cout << i++ << ". \n";
+				cout << yellow << "Checking fraud on: " << white << clientObj.cardHolderName << endl;
+				int fraud4 = unusualSpendingPatterns(clientObj.arr);
+				if (fraud4 == 2)
+					cout << red << "Daily Spending Limit Exceeded!!" << endl;
+				else if(fraud4 == 1)
+					cout << yellow << "Transactions are optimized to max out the limit - Potential Fraud" << endl;
+				else
+					cout << green << "Transaction Pattern is normal" << endl;
+				cout << blue << "----------------------------------------------------\n";
+			}
+		}
+		else if(choice == 5)
+		{
+			int fraudClusters = clusterFraudlentTransactionsTogether(allTransactions);
+			
+			if (fraudClusters > 20)
+			{
+				cout << red << "Country Fraud Clusters Found: " << fraudClusters << endl;
+			}
+			else
+				cout << green << "Country Fraud Clusters Found: " << fraudClusters << endl;
+			cout << blue << "----------------------------------------------------\n";
+		}
+		else if(choice == 6)
+		{
+			int indirectPaths = shortestFraudPathBetweenTransactions(allTransactions);
+        		cout << magenta << "Total Indirect Fraud Paths: " << white << indirectPaths << endl;
+			cout << blue << "----------------------------------------------------\n";
+		}
+		else if(choice == 7)
+		{
+			exitscr();
+		}
+		else
+		{
+			cout << red << "INVALID CHOICE!!" << white << endl;
+		}
+		char f;
+		cin >> f;
+		displayCenteredMenu(menu);
+	}while(true);
 
-                bool fraud3 = detectOverlappingTransactions(clientObj.arr);
-                cout << (fraud3 ? (red + "Overlapping Transactions Detected!") : (green + "No Overlap Found")) << endl;
-
-                int fraud4 = unusualSpendingPatterns(clientObj.arr);
-                if (fraud4 == 2)
-                        cout << red << "Daily spending limit exceeded!" << endl;
-                else if (fraud4 == 1)
-                        cout << yellow << "Transactions are optimized to max out the limit - Potential fraud!" << endl;
-                else
-                        cout << green << "Transaction pattern is normal." << endl;
-
-                cout << blue << "----------------------------------------------------\n";
-        }
-
+        
         // Detecting money laundering cycles using DFS cycle detection
-        // int count = fraudLoopInTransactionHistory(allTransactions);
+	// int count = fraudLoopInTransactionHistory(allTransactions);
         // cout << "Fraud cycles detected: " << count << endl;
-
-        // Global Fraud Cluster Detection using
-        int fraudClusters = clusterFraudlentTransactionsTogether(allTransactions);
-        if (fraudClusters > 20)
-        {
-                cout << red << "Country Fraud Clusters Found: " << fraudClusters << endl;
-        }
-        else
-        {
-                cout << green << "Country Fraud Clusters Found: " << fraudClusters << endl;
-        }
-
-        int indirectPaths = int shortestFraudPathBetweenTransactions(allTransactions);
-        cout << magenta << "Total Indirect Fraud Paths: " << white << indirectPaths << endl;
 
     return 0;
 }
