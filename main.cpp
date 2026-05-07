@@ -4,8 +4,19 @@
 #include <string>
 #include <chrono>
 #include <thread>
+#include <fstream>
+#include <cfloat>
 
 using namespace std;
+
+const string blue = "\033[1;34m";
+const string black = "\033[30m";
+const string red = "\033[31m";
+const string green = "\033[32m";
+const string yellow= "\033[33m";
+const string magenta = "\033[35m";
+const string cyan= "\033[36m";
+const string white= "\033[37m";
 
 // Clear Screen Function
 void clearscreen() {
@@ -16,24 +27,32 @@ void clearscreen() {
         #endif
 }
 
-// EXIT SCREEN
+// EXIT SCR
 void exitscr() {
-        auto start = chrono::high_resolution_clock::now();
-        cout << endl << endl << endl << endl << endl << endl << endl << endl << endl;
-        cout << "ooooooooooooo ooooo   ooooo       .o.       ooooo      ooo oooo    oooo      oooooo   oooo   .oooooo.   ooooo     ooo \n";
-        cout << "8'   888   `8 `888'   `888'      .888.      `888b.     `8' `888   .8P'        `888.   .8'   d8P'  `Y8b  `888'     `8' \n";
-        cout << "     888       888     888      .8\"888.      8 `88b.    8   888  d8'           `888. .8'   888      888  888       8  \n";
-        cout << "     888       888ooooo888     .8' `888.     8   `88b.  8   88888[              `888.8'    888      888  888       8  \n";
-        cout << "     888       888     888    .88ooo8888.    8     `88b.8   888`88b.             `888'     888      888  888       8  \n";
-        cout << "     888       888     888   .8'     `888.   8       `888   888  `88b.            888      `88b    d88'  `88.    .8'  \n";
-        cout << "    o888o     o888o   o888o o88o     o8888o o8o        `8  o888o  o888o          o888o      `Y8bood8P'     `YbodP'\n";
-        cout << "                         oooooooooooo   .oooooo.   ooooooooo.        ooooo     ooo  .oooooo..o ooooo ooooo      ooo   .oooooo.    \n";
-        cout << "                         `888'     `8  d8P'  `Y8b  `888   `Y88.      `888'     `8' d8P'    `Y8 `888' `888b.     `8'  d8P'  `Y8b   \n";
-        cout << "                          888         888      888  888   .d88'       888       8  Y88bo.       888   8 `88b.    8  888           \n";
-        cout << "                          888oooo8    888      888  888ooo88P'        888       8   `\"Y8888o.   888   8   `88b.  8  888           \n";
-        cout << "                          888    \"    888      888  888`88b.          888       8       `\"Y88b  888   8     `88b.8  888     ooooo \n";
-        cout << "                          888         `88b    d88'  888  `88b.        `88.    .8'  oo     .d8P  888   8       `888  `88.    .88'  \n";
-        cout << "                         o888o         `Y8bood8P'  o888o  o888o         `YbodP'    8\"\"88888P'  o888o o8o        `8   `Y8bood8P'\n";
+	auto start = chrono::high_resolution_clock::now();
+	
+ 	cout<<"\033[1m";
+ 	cout <<yellow<< R"(    
+	     _   _                 _                             
+            | | | |               | |                            
+            | |_| |__   __ _ _ __ | | __   _   _  ___  _   _     
+            | __| '_ \ / _` | '_ \| |/ /  | | | |/ _ \| | | |    
+            | |_| | | | (_| | | | |   <   | |_| | (_) | |_| |    
+             \__|_| |_|\__,_|_| |_|_|\_\   \__, |\___/ \__,_|    
+                                            __/ |                
+                                           |___/                 
+                        __                        _              
+                       / _|                      (_)             
+                      | |_ ___  _ __    _   _ ___ _ _ __   __ _  
+                      |  _/ _ \| '__|  | | | / __| | '_ \ / _` | 
+                      | || (_) | |     | |_| \__ \ | | | | (_| | 
+                      |_| \___/|_|      \__,_|___/_|_| |_|\__, | 
+                                                           __/ | 
+                                                          |___/  
+	  )" <<endl;
+	cout<<endl;
+
+
         while (true) {
             auto end = chrono::high_resolution_clock::now();
             auto duration = chrono::duration_cast<chrono::seconds>(end - start).count();
@@ -280,39 +299,198 @@ int detectOverlappingTransactions(const vector<transaction>& txns) {
     return 0;
 }
 
+struct UnionFind {
+    vector<int> parent, rank;
+    UnionFind(int n) {
+        parent.resize(n);
+        rank.assign(n, 0);
+        for(int i=0;i<n;i++){
+        	parent[i]=i;
+	}
+    }
+
+    int find(int x) {
+        if (parent[x] != x)
+            parent[x] = find(parent[x]); 
+        return parent[x];
+    }
+
+    void unite(int x, int y) {
+        int rx = find(x);
+	int ry = find(y);
+        if (rx == ry) return;
+        if (rank[rx] < rank[ry])
+		parent[rx] = ry;
+        else {
+            parent[ry] = rx;
+            if (rank[rx] == rank[ry]) rank[rx]++;
+        }
+    }
+};
+
+int convertToMinutes(const string& dateTime) {
+    int hours = stoi(dateTime.substr(11, 2));
+    int minutes = stoi(dateTime.substr(14, 2));
+    return hours * 60 + minutes;
+}
+
+double haversine(double lat1, double lon1, double lat2, double lon2) {
+    const double R = 6371.0;
+    double dLat = (lat2 - lat1) * M_PI / 180.0;
+    double dLon = (lon2 - lon1) * M_PI / 180.0;
+    lat1 *= M_PI / 180.0;
+    lat2 *= M_PI / 180.0;
+
+    double a = pow(sin(dLat / 2), 2) +
+               pow(sin(dLon / 2), 2) * cos(lat1) * cos(lat2);
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    return R * c;
+}
+
+int clusterFraudlentTransactionsTogether(const vector<transaction>& transactions) {
+	vector<transaction> frauds;
+	for (const auto& t : transactions)
+        	if (t.flag == 1) 
+			    frauds.push_back(t);
+    	int v = frauds.size();
+    	int n = frauds.size();
+	cout << "Total Fraudulent Transactions in Country: " << n << endl;
+    	if (v <= 1) return v;
+	float avgStateDiameter = 223.6;
+
+    	vector<tuple<double, int, int>> edges;
+
+	for (int i = 0; i < n; ++i) {
+		for (int j = i + 1; j < n; ++j) {
+            		double dist = haversine(frauds[i].merchantLatitude, frauds[i].merchantLongitude,
+                                    frauds[j].merchantLatitude, frauds[j].merchantLongitude);
+            		int timeDiff = abs(convertToMinutes(frauds[i].transactionDateTime) - 
+                               convertToMinutes(frauds[j].transactionDateTime));
+            		if (dist < avgStateDiameter && timeDiff < 60) { 
+                		edges.push_back({dist, i, j});
+            		}
+        	}
+    	}
+    	sort(edges.begin(), edges.end());
+    	UnionFind uf(n);
+    	for (auto& [dist, u, v] : edges)
+        	uf.unite(u, v);
+
+   
+    	set<int> clusters;
+   	for (int i = 0; i < n; ++i)
+        	clusters.insert(uf.find(i));
+
+    	return clusters.size();
+}
+
+int countIndirectFraudPaths(const vector<transaction>& transactions) {
+    // Extract fraudulent transactions
+    vector<transaction> frauds;
+    for (const auto& t : transactions) {
+        if (t.flag == 1)
+            frauds.push_back(t);
+    }
+
+    int n = frauds.size();
+    if (n == 0) return 0;
+
+    // Build adjacency list and record direct connections
+    vector<vector<pair<int, double>>> adj(n);
+    set<pair<int, int>> directEdges;
+
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            if (i == j) continue;
+
+            double dist = haversine(
+                frauds[i].merchantLatitude, frauds[i].merchantLongitude,
+                frauds[j].merchantLatitude, frauds[j].merchantLongitude);
+
+            int timeDiff = abs(
+                convertToMinutes(frauds[i].transactionDateTime) -
+                convertToMinutes(frauds[j].transactionDateTime));
+
+            if (dist < 50 && timeDiff < 15) {
+                adj[i].push_back({j, dist});
+                directEdges.insert({i, j});
+            }
+        }
+    }
+
+    // Count indirect paths using Dijkstra
+    int indirectPathCount = 0;
+
+    for (int src = 0; src < n; ++src) {
+        vector<double> dist(n, DBL_MAX);
+        dist[src] = 0.0;
+        priority_queue<pair<double, int>, vector<pair<double, int>>, greater<>> pq;
+        pq.push({0.0, src});
+
+        while (!pq.empty()) {
+            auto [curDist, u] = pq.top(); pq.pop();
+            for (auto [v, weight] : adj[u]) {
+                if (dist[v] > curDist + weight) {
+                    dist[v] = curDist + weight;
+                    pq.push({dist[v], v});
+                }
+            }
+        }
+
+        for (int dest = 0; dest < n; ++dest) {
+            if (src != dest && dist[dest] != DBL_MAX && !directEdges.count({src, dest})) {
+                indirectPathCount++;
+            }
+        }
+    }
+
+    return indirectPathCount;
+}
+
 // MAIN
 int main() {
-    	string filename = "fraudTestCSV.csv";
-    	map<string, client> allClients = readCSVFile(filename);
+    string filename = "fraudTestCSV.csv";
+    map<string, client> allClients = readCSVFile(filename);
+    vector<transaction> allTransactions;
+	
+    for (auto& [card, clientObj] : allClients) {
+        // Sort transactions by date
+        sort(clientObj.arr.begin(), clientObj.arr.end(), [](const transaction& a, const transaction& b) {
+            return a.transactionDateTime < b.transactionDateTime;
+        });
 
-	    for (auto& [card, clientObj] : allClients) {
-		    // Sort transactions by date
-    		sort(clientObj.arr.begin(), clientObj.arr.end(), [](const transaction& a, const transaction& b) {
-        		return a.transactionDateTime < b.transactionDateTime;
-    		});
+        // Clear and rebuild spendings in sorted order
+        clientObj.spendings.clear();
+        for (const auto& t : clientObj.arr) {
+            clientObj.spendings.push_back((int)t.amount);
+            allTransactions.push_back(t); // Collect all transactions globally
+        }
+    }
+/*
+    // Analyze each client individually for gradual/spike spending fraud
+    for (const auto& [card, clientObj] : allClients) {
+        cout << yellow << "Checking for fraud on: " << white << clientObj.cardHolderName << endl;
 
-    		// Clear and rebuild spendings in sorted order
-    		clientObj.spendings.clear();
-    		for (const auto& t : clientObj.arr) {
-        		clientObj.spendings.push_back((int)t.amount);
-    		}
-	    }
+        bool fraud1 = graduallyIncreasingFraudelentTransactionAmount(clientObj.spendings);
+        cout << (fraud1 ? (red + "Gradual Increase Fraud Detected!!") : (green + "No Gradual Increase Fraud")) << endl;
+
+        bool fraud2 = suddenSpikeInSpending(clientObj.spendings);
+        cout << (fraud2 ? (red + "Sudden Spending Spike Detected!") : (green + "No Sudden Spike")) << endl;
+
+        cout << blue << "----------------------------------------------------\n";
+    }
+*/
+    // Global Fraud Cluster Detection
+    int fraudClusters = clusterFraudlentTransactionsTogether(allTransactions);
+    if (fraudClusters > 20)
+        cout << red << "Country Fraud Clusters Found: " << fraudClusters << endl;
+    else
+        cout << green << "Country Fraud Clusters Found: " << fraudClusters << endl;
+	
+
+    int indirectPaths = countIndirectFraudPaths(allTransactions);
+    cout << magenta << "Total Indirect Fraud Paths: " << white << indirectPaths << endl;
 
 
-    	for (const auto& [card, clientObj] : allClients) {
-    		cout << "Checking for fraud on: " << clientObj.cardHolderName << endl;
-
-    		bool fraud1 = graduallyIncreasingFraudelentTransactionAmount(clientObj.spendings);
-    		cout << (fraud1 ? "Gradual Increase Fraud Detected!!" : "No Gradual Increase Fraud") << endl;
-
-    		bool fraud2 = suddenSpikeInSpending(clientObj.spendings);
-    		cout << (fraud2 ? "Sudden Spending Spike Detected!" : "No Sudden Spike") << endl;
-		
-		bool fraud3 = detectOverlappingTransactions(clientObj.arr);
-		cout << (fraud3 ? "Overlapping Transactions Detected!" : "No Overlap Found") << endl;
-
-    		cout << "----------------------------------------------------\n";
-	    }
-
-	    return 0;
+    return 0;
 }

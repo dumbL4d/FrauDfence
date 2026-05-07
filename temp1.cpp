@@ -4,8 +4,19 @@
 #include <string>
 #include <chrono>
 #include <thread>
+#include <fstream>
+#include <cfloat>
 
 using namespace std;
+
+const string blue = "\033[1;34m";
+const string black = "\033[30m";
+const string red = "\033[31m";
+const string green = "\033[32m";
+const string yellow= "\033[33m";
+const string magenta = "\033[35m";
+const string cyan= "\033[36m";
+const string white= "\033[37m";
 
 // Clear Screen Function
 void clearscreen() {
@@ -18,17 +29,10 @@ void clearscreen() {
 
 // EXIT SCREEN
 void exitscr() {
-        auto start = chrono::high_resolution_clock::now();
-       const std::string blue = "\033[1;34m";
- const std::string black = "\033[30m";
- const std::string red = "\033[31m";
- const std::string green = "\033[32m";
- const std::string yellow= "\033[33m";
- const std::string magenta = "\033[35m";
- const std::string cyan= "\033[36m";
- const std::string white= "\033[37m";
- cout<<"\033[1m";
- cout <<yellow<< R"(    
+	auto start = chrono::high_resolution_clock::now();
+	
+ 	cout<<"\033[1m";
+ 	cout <<yellow<< R"(    
 	     _   _                 _                             
             | | | |               | |                            
             | |_| |__   __ _ _ __ | | __   _   _  ___  _   _     
@@ -46,7 +50,7 @@ void exitscr() {
                                                            __/ | 
                                                           |___/  
 	  )" <<endl;
- cout<<endl;
+	cout<<endl;
 
 
         while (true) {
@@ -85,15 +89,13 @@ class transaction {
         double merchantLongitude;
         int flag;
 
-        transaction() {
-            flag = 0;
-        }
 };
 
 // Client Class
 class client {
     public:
         string cardHolderName;
+	string creditCardNumber;
         vector<transaction> arr;
         vector<int> spendings;
         int transactionsCompleted;
@@ -105,7 +107,7 @@ struct UnionFind {
         parent.resize(n);
         rank.assign(n, 0);
         for(int i=0;i<n;i++){
-        parent[i]=1;
+        	parent[i]=i;
 	}
     }
 
@@ -276,52 +278,56 @@ int suddenSpikeInSpending(const vector<int>& transactions) {
 }
 
 int clusterFraudlentTransactionsTogether(const vector<transaction>& transactions) {
-    vector<transaction> frauds;
-    for (const auto& t : transactions)
-        if (t.flag == 1) 
-	frauds.push_back(t);
-    int v = frauds.size();
-    if (v <= 1) return v;
+	vector<transaction> frauds;
+	for (const auto& t : transactions)
+        	if (t.flag == 1) 
+			    frauds.push_back(t);
+    	int v = frauds.size();
+    	int n = frauds.size();
+	cout << "Total Fraudulent Transactions in Country: " << n << endl;
+    	if (v <= 1) return v;
+	float avgStateDiameter = 223.6;
 
-    
-    vector<tuple<double, int, int>> edges;
+    	vector<tuple<double, int, int>> edges;
 
-    for (int i = 0; i < n; ++i) {
-        for (int j = i + 1; j < n; ++j) {
-            double dist = haversine(frauds[i].merchantLatitude, frauds[i].merchantLongitude,
+	for (int i = 0; i < n; ++i) {
+		for (int j = i + 1; j < n; ++j) {
+            		double dist = haversine(frauds[i].merchantLatitude, frauds[i].merchantLongitude,
                                     frauds[j].merchantLatitude, frauds[j].merchantLongitude);
-            int timeDiff = abs(convertToMinutes(frauds[i].transactionDateTime) - 
+            		int timeDiff = abs(convertToMinutes(frauds[i].transactionDateTime) - 
                                convertToMinutes(frauds[j].transactionDateTime));
-            if (dist < 5.0 && timeDiff < 30) { 
-                edges.push_back({dist, i, j});
-            }
-        }
-    }
-     sort(edges.begin(), edges.end());
-    UnionFind uf(n);
-    for (auto& [dist, u, v] : edges)
-        uf.unite(u, v);
+            		if (dist < avgStateDiameter && timeDiff < 60) { 
+                		edges.push_back({dist, i, j});
+            		}
+        	}
+    	}
+    	sort(edges.begin(), edges.end());
+    	UnionFind uf(n);
+    	for (auto& [dist, u, v] : edges)
+        	uf.unite(u, v);
 
    
-    set<int> clusters;
-    for (int i = 0; i < n; ++i)
-        clusters.insert(uf.find(i));
+    	set<int> clusters;
+   	for (int i = 0; i < n; ++i)
+        	clusters.insert(uf.find(i));
 
-    cout << "Number of fraud clusters: " << clusters.size() << endl;
-    return clusters.size();
+    	return clusters.size();
 }
 
-int shortestFraudPath(const vector<transaction>& transactions, int srcIdx, int destIdx) {
+int countIndirectFraudPaths(const vector<transaction>& transactions) {
+    // Extract fraudulent transactions
     vector<transaction> frauds;
-    for (const auto& t : transactions)
+    for (const auto& t : transactions) {
         if (t.flag == 1)
             frauds.push_back(t);
+    }
 
     int n = frauds.size();
-    if (n == 0 || srcIdx >= n || destIdx >= n) return -1;
+    if (n == 0) return 0;
 
-    
-    vector<vector<pair<int, double>>> adj(n); 
+    // Build adjacency list and record direct connections
+    vector<vector<pair<int, double>>> adj(n);
+    set<pair<int, int>> directEdges;
 
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
@@ -335,76 +341,86 @@ int shortestFraudPath(const vector<transaction>& transactions, int srcIdx, int d
                 convertToMinutes(frauds[i].transactionDateTime) -
                 convertToMinutes(frauds[j].transactionDateTime));
 
-            if (dist < 5.0 && timeDiff < 30) {
+            if (dist < 50 && timeDiff < 15) {
                 adj[i].push_back({j, dist});
+                directEdges.insert({i, j});
             }
         }
     }
 
-   
-    vector<double> dist(n, DBL_MAX);
-    dist[srcIdx] = 0.0;
+    // Count indirect paths using Dijkstra
+    int indirectPathCount = 0;
 
-    priority_queue<pair<double, int>, vector<pair<double, int>>, greater<>> pq;
-    pq.push({0.0, srcIdx});
+    for (int src = 0; src < n; ++src) {
+        vector<double> dist(n, DBL_MAX);
+        dist[src] = 0.0;
+        priority_queue<pair<double, int>, vector<pair<double, int>>, greater<>> pq;
+        pq.push({0.0, src});
 
-    while (!pq.empty()) {
-        auto [curDist, u] = pq.top();
-        pq.pop();
+        while (!pq.empty()) {
+            auto [curDist, u] = pq.top(); pq.pop();
+            for (auto [v, weight] : adj[u]) {
+                if (dist[v] > curDist + weight) {
+                    dist[v] = curDist + weight;
+                    pq.push({dist[v], v});
+                }
+            }
+        }
 
-        if (u == destIdx) break;
-
-        for (auto [v, weight] : adj[u]) {
-            if (dist[v] > curDist + weight) {
-                dist[v] = curDist + weight;
-                pq.push({dist[v], v});
+        for (int dest = 0; dest < n; ++dest) {
+            if (src != dest && dist[dest] != DBL_MAX && !directEdges.count({src, dest})) {
+                indirectPathCount++;
             }
         }
     }
 
-    if (dist[destIdx] == DBL_MAX) {
-        cout << "No valid fraud path found.\n";
-        return -1;
-    }
-
-    return dist[destIdx];
+    return indirectPathCount;
 }
 
-
-
-// MAIN
 int main() {
-    	string filename = "fraudTestCSV.csv";
-    	map<string, client> allClients = readCSVFile(filename);
+    string filename = "fraudTestCSV.csv";
+    map<string, client> allClients = readCSVFile(filename);
+    vector<transaction> allTransactions;
+	
+    for (auto& [card, clientObj] : allClients) {
+        // Sort transactions by date
+        sort(clientObj.arr.begin(), clientObj.arr.end(), [](const transaction& a, const transaction& b) {
+            return a.transactionDateTime < b.transactionDateTime;
+        });
 
-	    for (auto& [card, clientObj] : allClients) {
-		    // Sort transactions by date
-    		sort(clientObj.arr.begin(), clientObj.arr.end(), [](const transaction& a, const transaction& b) {
-        		return a.transactionDateTime < b.transactionDateTime;
-    		});
+        // Clear and rebuild spendings in sorted order
+        clientObj.spendings.clear();
+        for (const auto& t : clientObj.arr) {
+            clientObj.spendings.push_back((int)t.amount);
+            allTransactions.push_back(t); // Collect all transactions globally
+        }
+    }
+/*
+    // Analyze each client individually for gradual/spike spending fraud
+    for (const auto& [card, clientObj] : allClients) {
+        cout << yellow << "Checking for fraud on: " << white << clientObj.cardHolderName << endl;
 
-    		// Clear and rebuild spendings in sorted order
-    		clientObj.spendings.clear();
-    		for (const auto& t : clientObj.arr) {
-        		clientObj.spendings.push_back((int)t.amount);
-    		}
-	    }
+        bool fraud1 = graduallyIncreasingFraudelentTransactionAmount(clientObj.spendings);
+        cout << (fraud1 ? (red + "Gradual Increase Fraud Detected!!") : (green + "No Gradual Increase Fraud")) << endl;
+
+        bool fraud2 = suddenSpikeInSpending(clientObj.spendings);
+        cout << (fraud2 ? (red + "Sudden Spending Spike Detected!") : (green + "No Sudden Spike")) << endl;
+
+        cout << blue << "----------------------------------------------------\n";
+    }
+*/
+    // Global Fraud Cluster Detection
+    int fraudClusters = clusterFraudlentTransactionsTogether(allTransactions);
+    if (fraudClusters > 20)
+        cout << red << "Country Fraud Clusters Found: " << fraudClusters << endl;
+    else
+        cout << green << "Country Fraud Clusters Found: " << fraudClusters << endl;
+	
+
+    int indirectPaths = countIndirectFraudPaths(allTransactions);
+    cout << magenta << "Total Indirect Fraud Paths: " << white << indirectPaths << endl;
 
 
-    	for (const auto& [card, clientObj] : allClients) {
-    		cout << "Checking for fraud on: " << clientObj.cardHolderName << endl;
-
-    		bool fraud1 = graduallyIncreasingFraudelentTransactionAmount(clientObj.spendings);
-    		cout << (fraud1 ? "Gradual Increase Fraud Detected!!" : "No Gradual Increase Fraud") << endl;
-
-    		bool fraud2 = suddenSpikeInSpending(clientObj.spendings);
-    		cout << (fraud2 ? "Sudden Spending Spike Detected!" : "No Sudden Spike") << endl;
-
-    		cout << "----------------------------------------------------\n";
-	    }
-
-	    return 0;
+    return 0;
 }
-
-
 
