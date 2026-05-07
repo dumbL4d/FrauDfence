@@ -1,4 +1,22 @@
-#include <iostream>
+//Including standard library
+#include<iostream>
+#include<stdlib.h>
+#include<stdexcept>
+#include<string>
+#include<conio.h>
+#include<windows.h>
+
+// Time Libraries
+#include<chrono>
+#include<thread>
+
+//Including MySQL Libraries 
+#include <mysql_connection.h>
+#include <cppconn/driver.h>
+#include <cppconn/exception.h>
+#include <cppconn/resultset.h>
+#include <cppconn/statement.h>
+#include <mysql_driver.h>
 
 using namespace std;
 
@@ -29,7 +47,7 @@ public:
     flag = 0;
   }
   
-}
+};
 
 int main(){
   return 0;
