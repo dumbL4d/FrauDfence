@@ -28,6 +28,47 @@ void clearscreen()
 	#endif
 }
 
+// INTRO SCR
+void intro()
+{
+	auto start = chrono::high_resolution_clock::now();
+
+        cout << "\033[1m";
+    	cout << yellow << R"(    
+	     _   _                 _                             
+            | | | |               | |                            
+            | |_| |__   __ _ _ __ | | __   _   _  ___  _   _     
+            | __| '_ \ / _` | '_ \| |/ /  | | | |/ _ \| | | |    
+            | |_| | | | (_| | | | |   <   | |_| | (_) | |_| |    
+             \__|_| |_|\__,_|_| |_|_|\_\   \__, |\___/ \__,_|    
+                                            __/ |                
+                                           |___/                 
+                        __                        _              
+                       / _|                      (_)             
+                      | |_ ___  _ __    _   _ ___ _ _ __   __ _  
+                      |  _/ _ \| '__|  | | | / __| | '_ \ / _` | 
+                      | || (_) | |     | |_| \__ \ | | | | (_| | 
+                      |_| \___/|_|      \__,_|___/_|_| |_|\__, | 
+                                                           __/ | 
+                                                          |___/  
+	  )" << endl;
+    	cout << endl;
+
+    	while (true)
+    	{
+        	auto end = chrono::high_resolution_clock::now();
+        	auto duration = chrono::duration_cast<chrono::seconds>(end - start).count();
+
+        	if (duration >= 3)
+        	{
+            		clearscreen();
+            		break;
+        	}
+        	this_thread::sleep_for(chrono::milliseconds(100));
+    	}
+    	clearscreen();
+}
+
 // EXIT SCR
 void exitscr()
 {
@@ -237,7 +278,7 @@ int graduallyIncreasingFraudelentTransactionAmount(const vector<int> &spendings)
 }
 
 // Unusual Spending Pattern (Knapsack)
-int unusualSpendingPatterns(vector<transaction> &transactions)
+int unusualSpendingPatterns(const vector<transaction> &transactions)
 {
         int n = transactions.size();
         int creditLimit = 200000; // Credit Limit set to 200000
@@ -560,6 +601,7 @@ int countIndirectFraudPaths(const vector<transaction> &transactions)
 // MAIN
 int main()
 {
+	intro();
         string filename = "fraudTestCSV.csv";
         map<string, client> allClients = readCSVFile(filename);
         vector<transaction> allTransactions;
@@ -592,23 +634,23 @@ int main()
                 bool fraud2 = suddenSpikeInSpending(clientObj.spendings);
                 cout << (fraud2 ? (red + "Sudden Spending Spike Detected!") : (green + "No Sudden Spike")) << endl;
 
-                bool fraud3 = detectOverlappingTransactions(clientObj.transObj);
-                cout << (fraud3 ? "Overlapping Transactions Detected!" : "No Overlap Found") << endl;
+                bool fraud3 = detectOverlappingTransactions(clientObj.arr);
+                cout << (fraud3 ? (red + "Overlapping Transactions Detected!") : (green + "No Overlap Found")) << endl;
 
-                bool fraud4 = unusualSpendingPatterns(clientObj.transObj);
+                int fraud4 = unusualSpendingPatterns(clientObj.arr);
                 if (fraud4 == 2)
-                        cout << "Daily spending limit exceeded!" << endl;
+                        cout << red << "Daily spending limit exceeded!" << endl;
                 else if (fraud4 == 1)
-                        cout << "Transactions are optimized to max out the limit - Potential fraud!" << endl;
+                        cout << yellow << "Transactions are optimized to max out the limit - Potential fraud!" << endl;
                 else
-                        cout << "Transaction pattern is normal." << endl;
+                        cout << green << "Transaction pattern is normal." << endl;
 
                 cout << blue << "----------------------------------------------------\n";
         }
 
         // Detecting money laundering cycles using DFS cycle detection
-        int count = fraudLoopInTransactionHistory(allTransactions);
-        cout << "Fraud cycles detected: " << count << endl;
+        // int count = fraudLoopInTransactionHistory(allTransactions);
+        // cout << "Fraud cycles detected: " << count << endl;
 
         // Global Fraud Cluster Detection using
         int fraudClusters = clusterFraudlentTransactionsTogether(allTransactions);
@@ -626,3 +668,4 @@ int main()
 
     return 0;
 }
+
