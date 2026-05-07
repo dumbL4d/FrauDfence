@@ -10,6 +10,7 @@
 #include<chrono>
 #include<thread>
 
+/*
 //Including MySQL Libraries 
 #include <mysql_connection.h>
 #include <cppconn/driver.h>
@@ -17,6 +18,7 @@
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
 #include <mysql_driver.h>
+*/
 
 using namespace std;
 
