@@ -67,7 +67,7 @@ void exitscr() {
 class transaction
 {
 
-private:
+public:
     string transactionDateTime;
     string creditCardNumber;
     string merchantName;
@@ -79,7 +79,7 @@ private:
     string city;
     string state;
     int zipcode;
-    double clintLatitude;
+    double clientLatitude;
     double clientLongitude;
     string clientJob;
     string transactionNumber;
@@ -87,23 +87,59 @@ private:
     double merchantLongitude;
     int flag;
 
-public:
     transaction()
     {
         flag = 0;
     }
-    int suddenSpikeInSpending(); // Segment Tree / Sliding Window
-    int detectOverlappingTransactions(); // Interval Tree
-    int transactionValueAnomalies(); // Binary Search / BST
-    int fraudLoopInTransactionHistory(); // DFS / BFS (Cycle Detection)
-    int shortestFraudPathBetweenTransactions(); // Dijkstra
-    int clusterFraudlentTransactionsTogether(); // Union-Find / Kruskal
-    int merchantBasedFraudPatterns(); // Trie
-    int trackFraudelentTransactionHistory(); // BST
-    int identifyTopSuspiciousTransactions(); // Priority Queue
-    int graduallyIncreasingFraudelentTransactionAmount(); // Dynamic Programming (LIS)
-    int unusualSpendingPatterns(); // Knapsack
 };
+
+// Client Class
+class client
+{
+
+public:
+    string creditCardNumber;
+    string cardHolderName;
+    vector<transaction> arr;
+    vector<int> spendings;
+    int transactionsCompleted;
+};
+
+int suddenSpikeInSpending();                          // Segment Tree / Sliding Window
+int detectOverlappingTransactions();                  // Interval Tree
+int transactionValueAnomalies();                      // Binary Search / BST
+int fraudLoopInTransactionHistory();                  // DFS / BFS (Cycle Detection)
+int shortestFraudPathBetweenTransactions();           // Dijkstra
+int clusterFraudlentTransactionsTogether();           // Union-Find / Kruskal
+int merchantBasedFraudPatterns();                     // Trie
+int trackFraudelentTransactionHistory();              // BST
+int identifyTopSuspiciousTransactions();              // Priority Queue
+int graduallyIncreasingFraudelentTransactionAmount(); // Dynamic Programming (LIS)
+int unusualSpendingPatterns();                        // Knapsack
+
+int graduallyIncreasingFraudelentTransactionAmount(vector<int> &spendings)
+{
+    int n = spendings.size();
+    vector<int> dp(n, 1);
+
+    for (int i = 1; i < n; i++)
+    {
+        for (int j = 0; j < i; j++)
+        {
+            if (spendings[i] > spendings[j])
+            {
+                dp[i] = max(dp[i], dp[j] + 1);
+            }
+        }
+    }
+    int maxi = dp[0];
+
+    for (int i = 1; i < n; i++)
+    {
+        maxi = max(maxi, dp[i]);
+    }
+    return maxi > 7; // Increasing spending sequence limit set to 7. Change if required.
+}
 
 int main(){
     return 0;
